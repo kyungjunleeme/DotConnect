@@ -1,0 +1,45 @@
+# # This is a basic workflow to help you get started with Actions
+
+# name: CI
+
+# # Controls when the workflow will run
+# on:
+#   # Triggers the workflow on push or pull request events but only for the "main" branch
+#   push:
+#     branches: [ "main" ]
+#   pull_request:
+#     branches: [ "main" ]
+
+name: NMIXX News Crawler
+
+on:
+  schedule:
+    - cron: "0 9 * * *"  # 매일 오전 9시에 실행
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run NMIXX News Crawler
+      run: python nmixx_crawler.py
+
+    - name: Upload Latest News
+      uses: actions/upload-artifact@v3
+      with:
+        name: nmixx-latest-news
+        path: nmixx_latest_news.txt
